@@ -45,9 +45,9 @@ nnoremap <leader>; <C-w>w<CR>
 nnoremap <leader>n :CtrlP<CR>
 nnoremap <leader>j :CtrlPBuffer<CR>
 nnoremap ;ul :UltiSnipsEdit<CR>
-nnoremap ;run :!g++-9 % && ./a.out<CR>
-nnoremap ;rtest :!cf test<CR>
-nnoremap ;rsub  :!cf submit <CR>
+nnoremap ;run :!g++-7 % && ./a.out<CR>
+nnoremap ;cftest :!cf test<CR>
+nnoremap ;cfsub  :!cf submit <CR>
 nnoremap <leader>gs :G<CR>
 nnoremap <leader>gh :diffget //2<CR>
 nnoremap <leader>g; :diffget //3<CR>
@@ -59,7 +59,6 @@ nnoremap <leader>gc :Gdiffsplit!<CR>
 inoremap <silent><expr> <TAB>
       \ pumvisible() ? "\<C-n>" :
       \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
 let g:user_emmet_leader_key=";"
@@ -67,19 +66,16 @@ let g:user_emmet_leader_key=";"
 
 call plug#begin('~/.vim/plugged')
 Plug 'sheerun/vim-polyglot'
-Plug 'tpope/vim-fugitive'
 Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'jiangmiao/auto-pairs'
 Plug 'morhetz/gruvbox'
 Plug 'preservim/nerdtree'
-Plug 'neoclide/coc.nvim', {'branch': 'release'}
-"Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
 Plug 'ctrlpvim/ctrlp.vim'
 Plug 'google/vim-maktaba'
 Plug 'google/vim-codefmt'
 Plug 'google/vim-glaive'
-Plug 'sirver/ultisnips'
+"Plug 'sirver/ultisnips'
 Plug 'mlaursen/vim-react-snippets'
 Plug 'terryma/vim-multiple-cursors'
 Plug 'prettier/vim-prettier', {
@@ -90,6 +86,9 @@ Plug 'pangloss/vim-javascript'
 Plug 'mxw/vim-jsx'
 Plug 'mattn/emmet-vim' 
 "Plug 'dense-analysis/ale'
+Plug 'mlaursen/vim-react-snippets'
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'junegunn/fzf.vim'
 call plug#end()
 
 "call glaive#Install()
@@ -111,7 +110,7 @@ nnoremap gp :silent %!prettier --stdin-filepath % --trailing-comma all --single-
 let g:prettier#config#print_width = '120'
 let g:prettier#config#tab_width = '2'
 let g:prettier#config#use_tabs = 'false'
-let g:prettier#autoformat = 0
+let g:prettier#autoformat = 1
 autocmd BufWritePre *.js,*.jsx,*.mjs,*.ts,*.tsx,*.css,*.less,*.scss,*.json,*.graphql,*.md,*.vue,*.yaml,*.html PrettierAsync
 
 
@@ -163,35 +162,14 @@ set shortmess+=c
 " always show signcolumns
 set signcolumn=yes
 
-" Use tab for trigger completion with characters ahead and navigate.
-" Use command ':verbose imap <tab>' to make sure tab is not mapped by other plugin.
-inoremap <silent><expr> <TAB>
-      \ pumvisible() ? "\<C-n>" :
-      \ <SID>check_back_space() ? "\<TAB>" :
-      \ coc#refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-
 function! s:check_back_space() abort
   let col = col('.') - 1
   return !col || getline('.')[col - 1]  =~# '\s'
 endfunction
 
-" Use <c-space> to trigger completion.
-inoremap <silent><expr> <c-space> coc#refresh()
-
 " Use <cr> to confirm completion, `<C-g>u` means break undo chain at current position.
 " Coc only does snippet and additional edit on confirm.
 inoremap <expr> <cr> pumvisible() ? "\<C-y>" : "\<C-g>u\<CR>"
-
-" Use `[c` and `]c` to navigate diagnostics
-nmap <silent> [c <Plug>(coc-diagnostic-prev)
-nmap <silent> ]c <Plug>(coc-diagnostic-next)
-
-" Remap keys for gotos
-nmap <silent> gd <Plug>(coc-definition)
-nmap <silent> gy <Plug>(coc-type-definition)
-nmap <silent> gi <Plug>(coc-implementation)
-nmap <silent> gr <Plug>(coc-references)
 
 " Use K to show documentation in preview window
 nnoremap <silent> K :call <SID>show_documentation()<CR>
@@ -204,11 +182,7 @@ function! s:show_documentation()
   endif
 endfunction
 
-" Highlight symbol under cursor on CursorHold
-autocmd CursorHold * silent call CocActionAsync('highlight')
 
-" Remap for rename current word
-nmap <leader>rn <Plug>(coc-rename)
 
 " Remap for format selected region
 xmap <leader>f  <Plug>(coc-format-selected)
@@ -236,15 +210,6 @@ nmap <silent> <TAB> <Plug>(coc-range-select)
 xmap <silent> <TAB> <Plug>(coc-range-select)
 xmap <silent> <S-TAB> <Plug>(coc-range-select-backword)
 
-" Use `:Format` to format current buffer
-command! -nargs=0 Format :call CocAction('format')
-
-" Use `:Fold` to fold current buffer
-command! -nargs=? Fold :call     CocAction('fold', <f-args>)
-
-" use `:OR` for organize import of current buffer
-command! -nargs=0 OR   :call     CocAction('runCommand', 'editor.action.organizeImport')
-
 " Add status line support, for integration with other plugin, checkout `:h coc-status`
 set statusline^=%{coc#status()}%{get(b:,'coc_current_function','')}
 
@@ -265,3 +230,8 @@ nnoremap <silent> <space>j  :<C-u>CocNext<CR>
 nnoremap <silent> <space>k  :<C-u>CocPrev<CR>
 " Resume latest coc list
 nnoremap <silent> <space>p  :<C-u>CocListResume<CR>
+
+vmap <leader>aa <Plug>(coc-codeaction-selected)
+nmap <leader>aa <Plug>(coc-codeaction-selected)
+
+let g:fzf_preview_window = ['right:50%', 'ctrl-/']
